@@ -1,4 +1,4 @@
-# BWINF-Runde 1
+# BWINF2018-Runde 1
 Link zu Aufgabenstellung : https://bwinf.de/fileadmin/user_upload/BwInf/2018/37/1._Runde/Aufgaben/BWINF_37_Aufgaben_WEB.pdf
 
 Aufgabe 1: Superstar
