@@ -1,7 +1,8 @@
-import pygame
+import pygame, sys
 import random
 from pygame.locals import *
 from cell import Cell
+from Button import Button
 
 
 def determine_mouseOver(rect, valx, valy):
@@ -10,6 +11,12 @@ def determine_mouseOver(rect, valx, valy):
   else:
     return False
 
+def mousebuttondown():
+  pos = pygame.mouse.get_pos()
+  for button in buttons:
+    if button.rect.collidepoint(pos):
+      button.call_back()
+
 def randomGen(rects):
   for rect in rects:
     if random.randint(0,1) == 0:
@@ -17,6 +24,27 @@ def randomGen(rects):
     else:
       rect.c = (255,255,255)
   return rects
+
+def clear(rects):
+  for rect in rects:
+    rect.c = (0,0,0)
+  return rects
+
+def start(sims):
+  global sim
+  print('st')
+  sim = True
+  return sim
+
+def stop(sims):
+  global sim
+  sim = False
+  return sim
+
+def setTime(time):
+  global waittime
+  waittime = time
+  return time
 
 size = 25
 background_colour = (0,0,0)
@@ -34,16 +62,27 @@ for d in range(numy):
   for i in range(numx):
     rects.append(Cell(pygame.Rect(i * size, d * size, size, size), i, d))
 
+running = True
+sim = False
+waittime = 250
+
 # GUI elements
-ranGen = pygame.Rect(1050, 200, 100, 50)
-guiBack = pygame.Rect(1000,0,200,600)
+button01 = Button("RanGen", (1100, 200), randomGen, rects, screen)
+button02 = Button("Clear", (1100, 275), clear, rects, screen)
+button03 = Button("Start", (1100, 50), start, sim, screen, (0, 125, 0))
+button04 = Button("Stopp", (1100, 125), stop, sim, screen, (125, 0, 0))
+button05 = Button("1x", (1070, 350), setTime, 250, screen, size=(40, 40))
+button06 = Button("2x", (1130, 350), setTime, 125, screen, size=(40, 40))
+button07 = Button("4x", (1070, 425), setTime, 50, screen, size=(40, 40))
+button08 = Button("8x", (1130, 425), setTime,  1, screen, size=(40, 40))
+buttons = [button01, button02, button03, button04, button05, button06, button07, button08]
 mousex = 0
 mousey = 0
 
-running = True
-sim = False
+
 while running:
   mouseClicked = False
+  # events
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       running = False
@@ -52,11 +91,7 @@ while running:
     elif event.type == MOUSEBUTTONUP:
       mousex, mousey = event.pos
       mouseClicked = True
-    elif event.type == pygame.KEYDOWN:
-      if event.key == pygame.K_LEFT:
-        sim = False
-      if event.key == pygame.K_RIGHT:
-        sim = True
+      mousebuttondown()
 
   # the simulation
   if sim == True:
@@ -75,7 +110,7 @@ while running:
       rect.iteration()
     for rect in rects:
       rect.c = rect.cnew
-    pygame.time.wait(250)
+    pygame.time.wait(waittime)
 
   # modefying the rects
   for rect in rects:
@@ -88,10 +123,9 @@ while running:
       pygame.draw.rect(screen, rect.c, rect.rect)
 
   # GUI elements
-  pygame.draw.rect(screen, (0, 255, 0), guiBack)
-  if determine_mouseOver(ranGen, mousex, mousey) and mouseClicked == True:
-    randomGen(rects)
-  pygame.draw.rect(screen, (255, 0,0), ranGen)
+  for button in buttons:
+    button.draw()
+
   pygame.display.update()
   clock.tick(50)
 
